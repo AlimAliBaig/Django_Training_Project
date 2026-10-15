@@ -1,0 +1,6 @@
+{% extends "ledger/base.html" %}
+{% load ledger_extras %}
+{% block content %}
+<div class="narrow card"><h2>Delete expense?</h2><p>“{{ expense.title }}” ({{ expense.amount|money }}) will be removed and all balances recalculated.</p>
+<form method="post">{% csrf_token %}<div class="row"><button class="btn btn-danger">Yes, delete</button><a class="btn btn-ghost" href="{% url 'group_detail' group.pk %}">Cancel</a></div></form></div>
+{% endblock %}

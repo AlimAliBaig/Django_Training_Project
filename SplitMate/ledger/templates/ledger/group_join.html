@@ -1,0 +1,5 @@
+{% extends "ledger/base.html" %}
+{% block content %}
+<div class="narrow card"><h2>Join a group</h2><p class="muted">Ask a friend for the 6-character invite code shown on their group page.</p>
+<form method="post">{% csrf_token %}{% include "ledger/_form_fields.html" %}<button class="btn block">Join group</button></form></div>
+{% endblock %}

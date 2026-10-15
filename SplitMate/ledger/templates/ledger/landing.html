@@ -1,0 +1,23 @@
+{% extends "ledger/base.html" %}
+{% block content %}
+<section class="hero">
+  <div>
+    <span class="pill">For flatmates · trips · college projects</span>
+    <h1>Who owes who?<br><em>Settled in seconds.</em></h1>
+    <p class="lead">Add shared expenses, split them equally or by exact amounts, and let SplitMate work out the fewest payments needed so everyone is even.</p>
+    <div class="row"><a class="btn" href="{% url 'register' %}">Create free account</a><a class="btn btn-ghost" href="{% url 'login' %}">I have an account</a></div>
+  </div>
+  <div class="mock card">
+    <div class="mock-head">🏠 Flat 4B <span class="muted">3 members</span></div>
+    <div class="mock-row"><span>Riya paid · Groceries</span><b>₹1,240</b></div>
+    <div class="mock-row"><span>Aman paid · WiFi bill</span><b>₹899</b></div>
+    <div class="mock-row"><span>Sara paid · Pizza night</span><b>₹760</b></div>
+    <div class="mock-settle">Aman pays Riya <b>₹214.33</b></div>
+  </div>
+</section>
+<section class="grid3">
+  <div class="card"><h3>👥 Groups with invite codes</h3><p class="muted">Create a group, share a 6-letter code, friends join instantly.</p></div>
+  <div class="card"><h3>🧮 Smart splits</h3><p class="muted">Split equally among chosen people or enter exact amounts per person.</p></div>
+  <div class="card"><h3>🤝 Minimal settle-up</h3><p class="muted">Debts are simplified into the fewest payments, then logged as settlements.</p></div>
+</section>
+{% endblock %}

@@ -1,0 +1,81 @@
+{% extends "ledger/base.html" %}
+{% load ledger_extras %}
+{% block title %}{{ group.name }} · SplitMate{% endblock %}
+{% block content %}
+<div class="page-head">
+  <div><h1>{{ group.emoji }} {{ group.name }}</h1><p class="muted">{{ group.description|default:"Shared expenses" }} · invite code <code class="code">{{ group.invite_code }}</code></p></div>
+  <div class="row"><a class="btn btn-ghost" href="{% url 'settlement_create' group.pk %}">Record payment</a><a class="btn" href="{% url 'expense_create' group.pk %}">+ Add expense</a></div>
+</div>
+
+<div class="stats">
+  <div class="stat"><span>Group total</span><b>{{ total_spent|money }}</b></div>
+  <div class="stat {% if my_net > 0 %}good{% elif my_net < 0 %}bad{% endif %}"><span>Your balance</span>
+    <b>{% if my_net > 0 %}+{{ my_net|money }}{% elif my_net < 0 %}-{{ my_net|absval|money }}{% else %}Settled{% endif %}</b></div>
+  <div class="stat"><span>Members</span><b>{{ member_rows|length }}</b></div>
+</div>
+
+<div class="tabs">
+  <a href="?tab=expenses" class="{% if tab == 'expenses' %}on{% endif %}">Expenses</a>
+  <a href="?tab=balances" class="{% if tab == 'balances' %}on{% endif %}">Balances</a>
+  <a href="?tab=people" class="{% if tab == 'people' %}on{% endif %}">People</a>
+  <a href="?tab=history" class="{% if tab == 'history' %}on{% endif %}">Payments</a>
+</div>
+
+{% if tab == 'expenses' %}
+  <div class="split-layout">
+    <div class="card list">
+      {% for e in expenses %}
+      <div class="item">
+        <div><b>{{ e.title }}</b>
+          <small class="muted">{{ e.get_category_display }} · {{ e.paid_by|name }} paid · {{ e.date|date:"d M Y" }} · {{ e.shares.all|length }} sharing</small>
+        </div>
+        <div class="item-right"><b>{{ e.amount|money }}</b>
+          {% if e.created_by_id == user.pk or is_owner %}<span class="mini"><a href="{% url 'expense_update' group.pk e.pk %}">edit</a> · <a href="{% url 'expense_delete' group.pk e.pk %}">delete</a></span>{% endif %}
+        </div>
+      </div>
+      {% empty %}<p class="muted pad">No expenses yet — add the first one!</p>{% endfor %}
+    </div>
+    <aside class="card">
+      <h3>Where the money went</h3>
+      {% for r in cat_rows %}
+      <div class="bar"><div class="bar-top"><span>{{ r.label }}</span><b>{{ r.t|money }}</b></div><div class="bar-track"><i style="width: {{ r.percent }}%"></i></div></div>
+      {% empty %}<p class="muted">Nothing to chart yet.</p>{% endfor %}
+      <a class="btn btn-ghost block mt" href="{% url 'export_csv' group.pk %}">⬇ Export CSV</a>
+    </aside>
+  </div>
+
+{% elif tab == 'balances' %}
+  <div class="split-layout">
+    <div class="card">
+      <h3>Suggested settle-up</h3>
+      {% for s in suggestions %}
+      <div class="item"><div><b>{{ s.from|name }}</b> pays <b>{{ s.to|name }}</b></div>
+        <div class="item-right"><b>{{ s.amount|money }}</b>
+          {% if s.from.pk == user.pk %}<span class="mini"><a href="{% url 'settlement_create' group.pk %}?to={{ s.to.pk }}&amount={{ s.amount }}">mark as paid</a></span>{% endif %}</div></div>
+      {% empty %}<p class="muted">🎉 Everyone is settled up.</p>{% endfor %}
+    </div>
+    <div class="card">
+      <h3>Net balances</h3>
+      {% for r in member_rows %}
+      <div class="item"><div class="who"><span class="av">{{ r.user|initial }}</span>{{ r.user|name }}</div>
+        {% if r.net > 0 %}<b class="pos">gets {{ r.net|money }}</b>{% elif r.net < 0 %}<b class="neg">owes {{ r.net|absval|money }}</b>{% else %}<span class="muted">settled</span>{% endif %}</div>
+      {% endfor %}
+    </div>
+  </div>
+
+{% elif tab == 'people' %}
+  <div class="card">
+    <h3>Members</h3>
+    {% for r in member_rows %}<div class="item"><div class="who"><span class="av">{{ r.user|initial }}</span>{{ r.user|name }}{% if r.user.pk == group.owner_id %} <span class="tag">owner</span>{% endif %}</div><span class="muted">@{{ r.user.username }}</span></div>{% endfor %}
+    <p class="muted mt">Invite friends by sharing the code <code class="code">{{ group.invite_code }}</code>.</p>
+    <form method="post" action="{% url 'group_leave' group.pk %}" onsubmit="return confirm('Leave this group?');">{% csrf_token %}<button class="btn btn-danger btn-sm">Leave group</button></form>
+  </div>
+
+{% else %}
+  <div class="card list">
+    {% for s in settlements %}
+    <div class="item"><div><b>{{ s.payer|name }}</b> paid <b>{{ s.receiver|name }}</b><small class="muted">{{ s.date|date:"d M Y" }}{% if s.note %} · {{ s.note }}{% endif %}</small></div><b>{{ s.amount|money }}</b></div>
+    {% empty %}<p class="muted pad">No payments recorded yet.</p>{% endfor %}
+  </div>
+{% endif %}
+{% endblock %}

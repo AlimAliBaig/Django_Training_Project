@@ -1,0 +1,12 @@
+{% extends "ledger/base.html" %}
+{% block title %}Log in · SplitMate{% endblock %}
+{% block content %}
+<div class="narrow card">
+  <h2>Welcome back</h2>
+  <form method="post">{% csrf_token %}
+    {% include "ledger/_form_fields.html" %}
+    <button class="btn block">Log in</button>
+  </form>
+  <p class="muted center">New here? <a href="{% url 'register' %}">Create an account</a></p>
+</div>
+{% endblock %}

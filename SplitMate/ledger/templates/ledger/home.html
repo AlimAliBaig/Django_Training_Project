@@ -1,0 +1,39 @@
+{% extends "ledger/base.html" %}
+{% load ledger_extras %}
+{% block content %}
+<div class="page-head"><div><h1>Hi, {{ user|name }} 👋</h1><p class="muted">Here's where you stand across all your groups.</p></div>
+  <div class="row"><a class="btn btn-ghost" href="{% url 'group_join' %}">Join with code</a><a class="btn" href="{% url 'group_create' %}">+ New group</a></div></div>
+
+<div class="stats">
+  <div class="stat good"><span>You are owed</span><b>{{ owed_to_me|money }}</b></div>
+  <div class="stat bad"><span>You owe</span><b>{{ i_owe|money }}</b></div>
+  <div class="stat"><span>Net position</span><b>{{ net_total|money }}</b></div>
+</div>
+
+<h2 class="section">Your groups</h2>
+{% if cards %}
+<div class="grid3">
+  {% for c in cards %}
+  <a class="card group-card" href="{% url 'group_detail' c.group.pk %}">
+    <div class="g-emoji">{{ c.group.emoji }}</div>
+    <h3>{{ c.group.name }}</h3>
+    <p class="muted">{{ c.member_count }} member{{ c.member_count|pluralize }}{% if c.group.description %} · {{ c.group.description }}{% endif %}</p>
+    {% if c.net > 0 %}<span class="tag good">you get back {{ c.net|money }}</span>
+    {% elif c.net < 0 %}<span class="tag bad">you owe {{ c.net|absval|money }}</span>
+    {% else %}<span class="tag">all settled</span>{% endif %}
+  </a>
+  {% endfor %}
+</div>
+{% else %}
+<div class="card empty"><p>No groups yet. Create one for your flat or next trip, or join a friend's group with their invite code.</p></div>
+{% endif %}
+
+{% if recent %}
+<h2 class="section">Latest expenses</h2>
+<div class="card list">
+  {% for e in recent %}
+  <div class="item"><div><b>{{ e.title }}</b><small class="muted">{{ e.group.name }} · paid by {{ e.paid_by|name }} · {{ e.date|date:"d M" }}</small></div><b>{{ e.amount|money }}</b></div>
+  {% endfor %}
+</div>
+{% endif %}
+{% endblock %}

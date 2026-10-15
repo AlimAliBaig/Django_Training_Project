@@ -1,0 +1,32 @@
+{% extends "ledger/base.html" %}
+{% block content %}
+<div class="narrow wide card">
+  <h2>{% if editing %}Edit expense{% else %}Add an expense{% endif %} <span class="muted">· {{ group.name }}</span></h2>
+  <form method="post" id="expenseForm">{% csrf_token %}
+    {% if form.non_field_errors %}<div class="msg error">{{ form.non_field_errors }}</div>{% endif %}
+    <div class="two">
+      <div class="field"><label>{{ form.title.label }}</label>{{ form.title }}{% for e in form.title.errors %}<div class="err">{{ e }}</div>{% endfor %}</div>
+      <div class="field"><label>{{ form.amount.label }} (₹)</label>{{ form.amount }}{% for e in form.amount.errors %}<div class="err">{{ e }}</div>{% endfor %}</div>
+      <div class="field"><label>{{ form.paid_by.label }}</label>{{ form.paid_by }}{% for e in form.paid_by.errors %}<div class="err">{{ e }}</div>{% endfor %}</div>
+      <div class="field"><label>{{ form.category.label }}</label>{{ form.category }}</div>
+      <div class="field"><label>{{ form.date.label }}</label>{{ form.date }}{% for e in form.date.errors %}<div class="err">{{ e }}</div>{% endfor %}</div>
+      <div class="field"><label>{{ form.note.label }}</label>{{ form.note }}</div>
+    </div>
+
+    <div class="field"><label>How to split</label>{{ form.split_type }}{% for e in form.split_type.errors %}<div class="err">{{ e }}</div>{% endfor %}</div>
+
+    <div id="equalBox" class="field"><label>{{ form.participants.label }}</label>
+      <div class="checks">{{ form.participants }}</div>
+      {% for e in form.participants.errors %}<div class="err">{{ e }}</div>{% endfor %}</div>
+
+    <div id="exactBox" class="field hidden"><label>Amount each person owes (must add up to the total)</label>
+      <div class="two">{% for f in form.exact_fields %}<div class="field"><label>{{ f.label }}</label>{{ f }}{% for e in f.errors %}<div class="err">{{ e }}</div>{% endfor %}</div>{% endfor %}</div>
+      <small id="exactSum" class="muted"></small></div>
+
+    <div class="row"><button class="btn">{% if editing %}Save changes{% else %}Add expense{% endif %}</button><a class="btn btn-ghost" href="{% url 'group_detail' group.pk %}">Cancel</a></div>
+  </form>
+</div>
+{% endblock %}
+{% block scripts %}
+{% load static %}<script src="{% static 'ledger/js/app.js' %}"></script>
+{% endblock %}

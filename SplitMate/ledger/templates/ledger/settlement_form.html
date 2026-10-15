@@ -1,0 +1,6 @@
+{% extends "ledger/base.html" %}
+{% block content %}
+<div class="narrow card"><h2>Record a payment</h2><p class="muted">Log money that was actually handed over in <b>{{ group.name }}</b>.</p>
+<form method="post">{% csrf_token %}{% include "ledger/_form_fields.html" %}
+<div class="row"><button class="btn">Save payment</button><a class="btn btn-ghost" href="{% url 'group_detail' group.pk %}?tab=balances">Cancel</a></div></form></div>
+{% endblock %}
